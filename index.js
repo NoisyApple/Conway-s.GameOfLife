@@ -5,6 +5,9 @@ window.onload = function () {
   const COLUMNS = 50;
   const FPS = 60;
 
+  let isMouseDown = false;
+  let isRunning = false;
+
   let cells = new Array(ROWS);
   window.cells = cells;
 
@@ -17,8 +20,10 @@ window.onload = function () {
       let cell = document.createElement("div");
       cell.setAttribute("data-x", i);
       cell.setAttribute("data-y", j);
+      cell.setAttribute("onmousedown", "return false");
       cell.classList.add("cell");
-      cell.addEventListener("click", DOMCellEvent);
+      cell.addEventListener("mouseover", DOMCellEvent);
+      cell.addEventListener("mouseup", DOMCellEvent);
       gridContainer.appendChild(cell);
       cells[i][j] = new Cell(i, j);
     }
@@ -28,25 +33,37 @@ window.onload = function () {
 
   setInterval(updateCells, 1000 / FPS, cells);
 
-  function DOMCellEvent(e) {
-    let cellX = parseInt(e.target.dataset.x);
-    let cellY = parseInt(e.target.dataset.y);
+  document.addEventListener("mousedown", () => (isMouseDown = true));
+  document.addEventListener("mouseup", () => (isMouseDown = false));
+  document.addEventListener("keypress", (e) => {
+    if (e.keyCode == 32) isRunning = !isRunning;
+  });
 
-    cells[cellX][cellY].toggleAlive();
+  function DOMCellEvent(e) {
+    console.log(isMouseDown);
+
+    if (isMouseDown) {
+      let cellX = parseInt(e.target.dataset.x);
+      let cellY = parseInt(e.target.dataset.y);
+
+      cells[cellX][cellY].toggleAlive();
+    }
   }
 
   function updateCells(cells) {
-    cells.forEach((row) => {
-      row.forEach((cell) => {
-        cell.updateNeighbours();
+    if (isRunning) {
+      cells.forEach((row) => {
+        row.forEach((cell) => {
+          cell.updateNeighbours();
+        });
       });
-    });
 
-    cells.forEach((row) => {
-      row.forEach((cell) => {
-        cell.update();
+      cells.forEach((row) => {
+        row.forEach((cell) => {
+          cell.update();
+        });
       });
-    });
+    }
   }
 
   function assignNeighbours(cells) {
