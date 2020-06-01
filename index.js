@@ -6,7 +6,7 @@ window.onload = function () {
   const FPS = 60;
 
   let isMouseDown = false;
-  let isRunning = false;
+  let isRunning = true;
 
   let cells = new Array(ROWS);
   window.cells = cells;
